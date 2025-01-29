@@ -25,6 +25,12 @@ jobs:
         with:
           files: '**/*.xlsm'
 
+      - name: Skip workflow if no Excel files were modified
+        if: steps.changed-file.outputs.any_changed == 'false'
+        run: |
+          echo "✅ No Excel files changed. Skipping Qualer upload."
+          exit 0
+
       - name: Ensure Only One File is Changed
         if: steps.changed-file.outputs.any_changed == 'true'
         run: |
