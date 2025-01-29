@@ -15,11 +15,22 @@ jobs:
         with:
           fetch-depth: 0  # Ensures full commit history
 
+      - name: Debug Repository State
+        run: |
+          echo "🔍 Checking if repository is shallow..."
+          git rev-parse --is-shallow-repository
+          echo "🔍 Current branches:"
+          git branch -a
+          echo "🔍 Last 5 commits:"
+          git log --oneline -5
+          echo "🔍 Fetch depth information:"
+          git show-ref --head
+
       - name: Fetch all history (if shallow)
         run: |
           if git rev-parse --is-shallow-repository; then
             echo "🔄 Repository is shallow, fetching full history..."
-            git fetch --prune --unshallow
+            git fetch --prune --unshallow || git fetch --prune
           else
             echo "✅ Repository is already fully cloned."
           fi
