@@ -13,20 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Ensures the full commit history is available
+          fetch-depth: 0
 
       - name: Checkout shared CI scripts
         uses: actions/checkout@v3
         with:
           repository: Johnson-Gage-Inspection-Inc/ci-scripts
           path: ci-scripts
+          fetch-depth: 0
 
       - name: Locate Changed Excel File
         id: changed-file
         uses: tj-actions/changed-files@v35
         with:
           files: '**/*.xlsx'
-          fetch-depth: 0  # Ensures the full commit history is available
+          fetch-depth: 0
 
       - name: Skip workflow if no Excel files were modified
         if: steps.changed-file.outputs.any_changed == 'false'
