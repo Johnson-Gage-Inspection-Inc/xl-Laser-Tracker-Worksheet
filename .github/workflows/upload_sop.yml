@@ -13,44 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Fetch full history for proper diffing
 
-      - name: Checkout shared CI scripts
-        uses: actions/checkout@v3
-        with:
-          repository: Johnson-Gage-Inspection-Inc/ci-scripts
-          path: ci-scripts
-          fetch-depth: 0
+      - name: Fetch all history
+        run: git fetch --prune
 
-      - name: Fetch all history for comparison
+      - name: Check for changes in Excel files
+        id: check
         run: |
-          if git rev-parse --is-shallow-repository; then
-            echo "Repository is shallow. Fetching full history..."
-            git fetch --prune --unshallow
-          else
-            echo "✅ Repository is already fully cloned."
+          if git diff --quiet origin/main HEAD -- '*.xlsm'; then
+            echo "✅ No Excel files changed. Skipping Qualer upload."
+            echo "skip=true" >> $GITHUB_ENV
+            exit 0
           fi
-
-      - name: Debug Git History
-        run: |
-          echo "Current branch:"
-          git branch
-          echo "Last 5 commits:"
-          git log --oneline -5
-
-      - name: Locate Changed Excel File
-        id: changed-file
-        uses: tj-actions/changed-files@v35
-        continue-on-error: true
-        with:
-          files: '**/*.xlsx'
-          fetch-depth: 0
-
-      - name: Skip workflow if no Excel files were modified
-        if: failure() || steps.changed-file.outputs.any_changed == 'false'
-        run: |
-          echo "✅ No Excel files changed. Skipping Qualer upload."
-          exit 0
 
       - name: Ensure Only One File is Changed
         if: steps.changed-file.outputs.any_changed == 'true'
@@ -63,10 +38,9 @@ jobs:
           echo "MERGED_FILE=${{ steps.changed-file.outputs.all_changed_files }}" >> $GITHUB_ENV
 
       - name: Upload Excel File to Qualer
-        if: steps.changed-file.outputs.any_changed == 'true'
+        if: env.skip != 'true'
         run: ./ci-scripts/upload_sop.sh
         env:
           QUALER_EMAIL: ${{ secrets.QUALER_EMAIL }}
           QUALER_PASSWORD: ${{ secrets.QUALER_PASSWORD }}
           SOP_ID: 2420
-          MERGED_FILE: ${{ env.MERGED_FILE }}
