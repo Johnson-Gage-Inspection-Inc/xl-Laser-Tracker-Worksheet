@@ -25,7 +25,7 @@ jobs:
         id: changed-file
         uses: tj-actions/changed-files@v35
         with:
-          files: '**/*.xlsm'
+          files: '**/*.xlsx'
           fetch-depth: 0  # Ensures the full commit history is available
 
       - name: Skip workflow if no Excel files were modified
