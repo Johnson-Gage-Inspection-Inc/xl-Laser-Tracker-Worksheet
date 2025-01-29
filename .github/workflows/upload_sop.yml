@@ -25,6 +25,13 @@ jobs:
       - name: Fetch all history for comparison
         run: git fetch --prune --unshallow
 
+      - name: Debug Git History
+        run: |
+          echo "Current branch:"
+          git branch
+          echo "Last 5 commits:"
+          git log --oneline -5
+
       - name: Locate Changed Excel File
         id: changed-file
         uses: tj-actions/changed-files@v35
