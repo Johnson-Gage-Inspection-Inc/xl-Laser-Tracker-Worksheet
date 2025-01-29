@@ -22,6 +22,9 @@ jobs:
           path: ci-scripts
           fetch-depth: 0
 
+      - name: Fetch all history for comparison
+        run: git fetch --prune --unshallow
+
       - name: Locate Changed Excel File
         id: changed-file
         uses: tj-actions/changed-files@v35
