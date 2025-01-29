@@ -23,7 +23,13 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch all history for comparison
-        run: git fetch --prune --unshallow
+        run: |
+          if git rev-parse --is-shallow-repository; then
+            echo "Repository is shallow. Fetching full history..."
+            git fetch --prune --unshallow
+          else
+            echo "✅ Repository is already fully cloned."
+          fi
 
       - name: Debug Git History
         run: |
