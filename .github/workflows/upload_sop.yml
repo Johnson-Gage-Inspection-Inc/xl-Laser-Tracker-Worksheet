@@ -35,12 +35,13 @@ jobs:
       - name: Locate Changed Excel File
         id: changed-file
         uses: tj-actions/changed-files@v35
+        continue-on-error: true
         with:
           files: '**/*.xlsx'
           fetch-depth: 0
 
       - name: Skip workflow if no Excel files were modified
-        if: steps.changed-file.outputs.any_changed == 'false'
+        if: failure() || steps.changed-file.outputs.any_changed == 'false'
         run: |
           echo "✅ No Excel files changed. Skipping Qualer upload."
           exit 0
